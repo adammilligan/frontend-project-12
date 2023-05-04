@@ -9,6 +9,8 @@ import Row from 'react-bootstrap/Row';
 import FormBootstrap from 'react-bootstrap/Form';
 import { Nav } from 'react-bootstrap';
 
+import avatarLogin from '../assets/avatar.jpeg';
+
 const LoginPage = () => {
   const schema = yup.object().shape({
     username: yup.string().min(3, 'от 3 до 20 символов').max(20, 'от 3 до 20 символов').required('обязательное поле'),
@@ -27,7 +29,7 @@ const LoginPage = () => {
 
       <Row>
         <Col>
-          картинка
+          <img src={avatarLogin} alt="картинка" />
         </Col>
 
         <Col>
@@ -60,7 +62,7 @@ const LoginPage = () => {
                   <FormBootstrap.Control.Feedback type="invalid">{errors.username}</FormBootstrap.Control.Feedback>
                 </FormBootstrap.Group>
 
-                <FormBootstrap.Group as={Col} md="11" className="LoginPage-input-item">
+                <FormBootstrap.Group as={Col} md="11" className="LoginPage-input-item mb-3">
                   <FormBootstrap.Label>Пароль</FormBootstrap.Label>
                   <FormBootstrap.Control
                     required
@@ -76,7 +78,7 @@ const LoginPage = () => {
                 </FormBootstrap.Group>
                 {errors.authNotCorrect && (<div>not correct</div>)}
                 <FormBootstrap.Group as={Col} md="11">
-                  <ButtonBootstrap variant="outline-primary" className="Login-button" type="submit">Войти</ButtonBootstrap>
+                  <ButtonBootstrap variant="outline-primary" className="Login-button mb-3" type="submit">Войти</ButtonBootstrap>
                 </FormBootstrap.Group>
               </FormBootstrap>
             )}
