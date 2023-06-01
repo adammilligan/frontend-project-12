@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import avatarImagePath from '../../assets/avatar.jpeg';
-import useAuth from '../../hooks';
+import { useAuth } from '../../hooks';
 import routes from '../../routes/routes.js';
 
 const logInSchema = yup.object({
@@ -42,8 +42,8 @@ const LoginPage = () => {
 
       try {
         const res = await axios.post(routes.loginPath(), values);
-        localStorage.setItem('userId', JSON.stringify(res.data));
-        auth.logIn();
+        localStorage.setItem('userId', JSON.stringify({ ...res.data, username: values.username }));
+        auth.logIn({ username: values.username });
         const { from } = location.state || { from: { pathname: '/' } };
         navigate(from);
       } catch (err) {
@@ -65,7 +65,7 @@ const LoginPage = () => {
           <Card className="shadow-sm">
             <Card.Body className="p-5 row">
               <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-                <img src={avatarImagePath} alt="LogIn page" className="roundedCircle" />
+                <img src={avatarImagePath} alt="LogIn" className="roundedCircle" />
               </div>
               <Form
                 className="col-12 col-md-6 mt-3 mt-mb-0"

@@ -12,6 +12,8 @@
   "author": "Valygin Vadim",
   "license": "ISC",
   "dependencies": {
-    "@hexlet/chat-server": "^1.1.6"
+    "@hexlet/chat-server": "^1.1.6",
+    "leo-profanity": "^1.7.0",
+    "socket.io-client": "^4.6.2"
   }
 }
