@@ -1,25 +1,28 @@
 import React, { useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import leoProfanity from 'leo-profanity';
+import { useTranslation } from 'react-i18next';
 import {
   Modal, Form, Button, FormControl,
 } from 'react-bootstrap';
 import * as yup from 'yup';
+import { toast } from 'react-toastify';
 
 import { useSelector } from 'react-redux';
 import { useSocketApi } from '../../../hooks';
 
-const channelsValidationSchema = (channelsNames) => yup.object().shape({
+const channelsValidationSchema = (channelsNames, translate) => yup.object().shape({
   name: yup
     .string()
     .trim()
-    .required('required')
-    .min(3, 'min')
-    .max(20, 'max')
-    .notOneOf(channelsNames, 'duplicate'),
+    .required(translate('required'))
+    .min(3, translate('nameLength'))
+    .max(20, translate('nameLength'))
+    .notOneOf(channelsNames, translate('modals.duplicate')),
 });
 
 const RenameChannel = ({ onHide, modalInfo }) => {
+  const { t } = useTranslation();
   const channels = useSelector((s) => s.channelsInfo.channels);
   const channelsNames = channels.map((channel) => channel.name);
   const currentChannel = modalInfo.channel;
@@ -32,16 +35,22 @@ const RenameChannel = ({ onHide, modalInfo }) => {
     input.current.select();
   }, []);
 
+  const notify = () => toast.success(t('toasts.renameChannel'));
+
+  const handleClose = () => {
+    onHide();
+    notify();
+  };
+
   const formik = useFormik({
     initialValues: {
       name: currentChannel.name,
     },
-    validationSchema: channelsValidationSchema(channelsNames),
+    validationSchema: channelsValidationSchema(channelsNames, t),
     onSubmit: async (values) => {
-      leoProfanity.loadDictionary('ru');
       const cleanedName = leoProfanity.clean(values.name);
       try {
-        await socketApi.renameChannel({ name: cleanedName, id: currentChannel.id }, onHide);
+        await socketApi.renameChannel({ name: cleanedName, id: currentChannel.id }, handleClose);
         formik.values.name = '';
       } catch (error) {
         console.error(error.message);
@@ -52,7 +61,7 @@ const RenameChannel = ({ onHide, modalInfo }) => {
   return (
     <Modal show centered onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>Переименовать канал</Modal.Title>
+        <Modal.Title>{t('modals.renameChannel')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={formik.handleSubmit}>
@@ -67,7 +76,7 @@ const RenameChannel = ({ onHide, modalInfo }) => {
               value={formik.values.name}
               isInvalid={!!formik.errors.name}
             />
-            <Form.Label htmlFor="name" visuallyHidden>Имя канала</Form.Label>
+            <Form.Label htmlFor="name" visuallyHidden>{t('modals.channelName')}</Form.Label>
             <FormControl.Feedback type="invalid">
               {formik.errors.name}
             </FormControl.Feedback>
@@ -77,7 +86,7 @@ const RenameChannel = ({ onHide, modalInfo }) => {
                 type="button"
                 onClick={onHide}
               >
-                Отменить
+                {t('modals.cancelButton')}
               </Button>
               <Button
                 variant="primary"
@@ -85,7 +94,7 @@ const RenameChannel = ({ onHide, modalInfo }) => {
                 onClick={formik.handleSubmit}
                 disabled={formik.errors.name}
               >
-                Отправить
+                {t('modals.rename')}
               </Button>
             </Modal.Footer>
           </Form.Group>

@@ -4,22 +4,25 @@ import leoProfanity from 'leo-profanity';
 import {
   Modal, Form, Button, FormControl,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import { useSocketApi } from '../../../hooks';
 
-const channelsValidationSchema = (channelsNames) => yup.object().shape({
+const channelsValidationSchema = (channelsNames, translate) => yup.object().shape({
   name: yup
     .string()
     .trim()
-    .required('required')
-    .min(3, 'min')
-    .max(20, 'max')
-    .notOneOf(channelsNames, 'duplicate'),
+    .required(translate('required'))
+    .min(3, translate('nameLength'))
+    .max(20, translate('nameLength'))
+    .notOneOf(channelsNames, translate('modals.duplicate')),
 });
 
 const AddChannel = ({ onHide }) => {
+  const { t } = useTranslation();
   const channels = useSelector((s) => s.channelsInfo.channels);
   const channelsNames = channels.map((channel) => channel.name);
   const socketApi = useSocketApi();
@@ -30,16 +33,22 @@ const AddChannel = ({ onHide }) => {
     input.current.focus();
   }, []);
 
+  const notify = () => toast.success(t('toasts.createChannel'));
+
+  const handleClose = () => {
+    onHide();
+    notify();
+  };
+
   const formik = useFormik({
     initialValues: {
       name: '',
     },
-    validationSchema: channelsValidationSchema(channelsNames),
+    validationSchema: channelsValidationSchema(channelsNames, t),
     onSubmit: async (values) => {
-      leoProfanity.loadDictionary('ru');
       const cleanedName = leoProfanity.clean(values.name);
       try {
-        await socketApi.newChannel(cleanedName, onHide);
+        await socketApi.newChannel(cleanedName, handleClose);
         formik.values.name = '';
       } catch (error) {
         console.error(error.message);
@@ -50,7 +59,7 @@ const AddChannel = ({ onHide }) => {
   return (
     <Modal show centered onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>Добавить канал</Modal.Title>
+        <Modal.Title>{t('modals.addChannel')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={formik.handleSubmit}>
@@ -65,7 +74,7 @@ const AddChannel = ({ onHide }) => {
               value={formik.values.name}
               isInvalid={!!formik.errors.name}
             />
-            <Form.Label htmlFor="name" visuallyHidden>Имя канала</Form.Label>
+            <Form.Label htmlFor="name" visuallyHidden>{t('modals.channelName')}</Form.Label>
             <FormControl.Feedback type="invalid">
               {formik.errors.name}
             </FormControl.Feedback>
@@ -75,7 +84,7 @@ const AddChannel = ({ onHide }) => {
                 type="button"
                 onClick={onHide}
               >
-                Отменить
+                {t('modals.cancelButton')}
               </Button>
               <Button
                 variant="primary"
@@ -83,7 +92,7 @@ const AddChannel = ({ onHide }) => {
                 onClick={formik.handleSubmit}
                 disabled={formik.errors.name}
               >
-                Отправить
+                {t('modals.addButton')}
               </Button>
             </Modal.Footer>
           </Form.Group>

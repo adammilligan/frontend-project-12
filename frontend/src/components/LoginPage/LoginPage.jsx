@@ -5,27 +5,15 @@ import * as yup from 'yup';
 import {
   Button, Form, Col, Card, Row,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { NavLink, useNavigate } from 'react-router-dom';
 import avatarImagePath from '../../assets/avatar.jpeg';
+
 import { useAuth } from '../../hooks';
 import routes from '../../routes/routes.js';
 
-const logInSchema = yup.object().shape({
-  username: yup
-    .string()
-    .trim()
-    .min(5, 'От 5 до 20 символов')
-    .max(20, 'От 5 до 20 символов')
-    .required('Обязательное поле'),
-  password: yup
-    .string()
-    .trim()
-    .min(5, 'От 5 до 20 символов')
-    .max(20, 'От 5 до 20 символов')
-    .required('Обязательное поле'),
-});
-
 const LoginPage = () => {
+  const { t } = useTranslation();
   const auth = useAuth();
   const [authFailed, setAuthFailed] = useState(false);
   const navigate = useNavigate();
@@ -33,6 +21,22 @@ const LoginPage = () => {
   useEffect(() => {
     input.current.focus();
   }, []);
+
+  const changeHandler = (e) => {
+    e.preventDefault();
+    setAuthFailed(false);
+  };
+
+  const logInSchema = yup.object().shape({
+    username: yup
+      .string()
+      .trim()
+      .required(),
+    password: yup
+      .string()
+      .trim()
+      .required(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -73,48 +77,58 @@ const LoginPage = () => {
                 className="col-12 col-md-6 mt-3 mt-mb-0"
                 onSubmit={formik.handleSubmit}
               >
-                <h1 className="text-center mb-4">Войти</h1>
+                <h1 className="text-center mb-4">{t('enter')}</h1>
                 <fieldset disabled={formik.isSubmitting}>
                   <Form.Group className="mb-3 form-floating" controlId="username">
                     <Form.Control
                       type="text"
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        changeHandler(e);
+                        formik.handleChange(e);
+                      }}
                       value={formik.values.username}
                       onBlur={formik.handleBlur}
-                      placeholder="username"
+                      placeholder={t('username')}
                       autoComplete="username"
-                      isInvalid={authFailed}
-                      isValid={formik.touched.password && !formik.errors.username}
                       required
                       ref={input}
                     />
-                    <Form.Label>Ваш ник</Form.Label>
+                    <Form.Label>{t('username')}</Form.Label>
                   </Form.Group>
 
                   <Form.Group className="mb-4 form-floating" controlId="password">
                     <Form.Control
                       type="password"
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        changeHandler(e);
+                        formik.handleChange(e);
+                      }}
                       value={formik.values.password}
                       onBlur={formik.handleBlur}
-                      placeholder="password"
+                      placeholder={t('password')}
                       autoComplete="current-password"
                       isInvalid={authFailed}
-                      isValid={formik.touched.password && !formik.errors.password}
                       required
                     />
-                    <Form.Label>Пароль</Form.Label>
-                    <Form.Control.Feedback type="invalid" className="invalid-feedback" tooltip>Неверные имя пользователя или пароль</Form.Control.Feedback>
+                    <Form.Label>{t('password')}</Form.Label>
+                    <Form.Control.Feedback type="invalid" className="invalid-feedback" tooltip>{t('invalidData')}</Form.Control.Feedback>
                   </Form.Group>
-                  <Button type="submit" variant="outline-primary" className="w-100 mb-3">Войти</Button>
+                  <Button
+                    type="submit"
+                    variant="outline-primary"
+                    className="w-100 mb-3"
+                    disabled={formik.errors.username || formik.errors.password}
+                  >
+                    {t('enter')}
+                  </Button>
                 </fieldset>
               </Form>
             </Card.Body>
             <Card.Footer className="p-4">
               <div className="text-center">
-                <span>Нет аккаунта?</span>
+                <span>{t('noAccount')}</span>
                 {' '}
-                <NavLink to={routes.signupPagePath()}>Регистрация</NavLink>
+                <NavLink to={routes.signupPagePath()}>{t('signUp')}</NavLink>
               </div>
             </Card.Footer>
           </Card>
