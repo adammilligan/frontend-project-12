@@ -7,39 +7,24 @@ import {
   Routes,
   Route,
   Link,
-  Navigate,
-  useLocation,
 } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Navbar, Container, Button } from 'react-bootstrap';
 import { BsGlobe } from 'react-icons/bs';
 import { ToastContainer, toast } from 'react-toastify';
 import { Provider, ErrorBoundary } from '@rollbar/react';
+import rollbarConfig from '../rollbar/rollbarConfig.js';
 
 import ChatPage from './ChatPage/ChatPage.jsx';
 import LoginPage from './LoginPage/LoginPage.jsx';
 import NotFoundPage from './NotFoundPage/NotFoundPage.jsx';
 import SignUpPage from './SignUpPage/SignUpPage.jsx';
+
+import PrivateRoute from '../routes/PrivateRoute.jsx';
+import PublicRoute from '../routes/PublicRoute.jsx';
+
 import { useAuth } from '../hooks';
 import routes from '../routes/routes.js';
-
-const rollbarConfig = {
-  accessToken: process.env.REACT_APP_ROLLBAR_ACCESS_TOKEN,
-  payload: {
-    environment: 'production',
-  },
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-};
-
-const PrivateRoute = ({ children }) => {
-  const auth = useAuth();
-  const location = useLocation();
-
-  return (
-    auth.loggedIn ? children : <Navigate to={routes.loginPagePath()} state={{ from: location }} />
-  );
-};
 
 const AuthButton = ({ translation }) => {
   const auth = useAuth();
@@ -78,17 +63,14 @@ const App = () => {
               </Container>
             </Navbar>
             <Routes>
-              <Route
-                path={routes.chatPagePath()}
-                element={(
-                  <PrivateRoute>
-                    <ChatPage />
-                  </PrivateRoute>
-                )}
-              />
-              <Route path={routes.loginPagePath()} element={<LoginPage />} />
+              <Route element={<PrivateRoute />}>
+                <Route path={routes.chatPagePath()} element={<ChatPage />} />
+              </Route>
+              <Route element={<PublicRoute />}>
+                <Route path={routes.loginPagePath()} element={<LoginPage />} />
+                <Route path={routes.signupPagePath()} element={<SignUpPage />} />
+              </Route>
               <Route path={routes.notFoundPagePath()} element={<NotFoundPage />} />
-              <Route path={routes.signupPagePath()} element={<SignUpPage />} />
             </Routes>
             <ToastContainer
               position="top-right"

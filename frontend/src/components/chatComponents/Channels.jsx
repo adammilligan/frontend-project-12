@@ -26,6 +26,35 @@ const Channels = () => {
   const { setCurrentChannel } = actions;
   const dispatch = useDispatch();
 
+  // Гена, вот тут застрял) Пытаюсь сделать, чтобы при первом рендере не срабатывал useEffect
+  // Как при componentDidUpdate.
+  // Но срабатывает 2 рендера, один сразу и один после получения списка каналов с сервера
+  // Подскажи, как правильно обойти?
+  // В демо-проекте происходит только один action channelsInfo/setInitialState при загрузке чата
+  // Как-будто нет запроса на сервер...
+  /*
+
+  const useIsMount = () => {
+    const isMountRef = useRef(true);
+    useEffect(() => {
+      isMountRef.current = false;
+    }, []);
+    return isMountRef.current;
+  };
+
+  const channelsView = useRef(null);
+  const isMount = useIsMount();
+
+  useEffect(() => {
+    if (!isMount) {
+      channelsView
+        .current
+        ?.lastElementChild
+        ?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [channels.length, isMount]);
+  */
+
   const handleClick = (id) => {
     dispatch(setCurrentChannel({ id }));
   };
@@ -45,7 +74,7 @@ const Channels = () => {
         </div>
         <Nav
           as="ul"
-          className="flex-column nav-pills nav-fill px-2 mb-3 h-100 d-block"
+          className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
           id="channels-box"
           activeKey={currentChannelId}
         >

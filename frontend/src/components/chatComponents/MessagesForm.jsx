@@ -5,8 +5,9 @@ import leoProfanity from 'leo-profanity';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 import { BsArrowRightSquare } from 'react-icons/bs';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
-import { useAuth, useSocketApi } from '../../hooks';
+import { useAuth, useChatApi } from '../../hooks';
 
 const messageFormSchema = yup.object().shape({
   body: yup.string().required(),
@@ -15,8 +16,10 @@ const messageFormSchema = yup.object().shape({
 const MessagesForm = ({ activeChannel }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const socketApi = useSocketApi();
+  const chatApi = useChatApi();
   const input = useRef(null);
+
+  const notifyError = (text) => toast.error(t(`toasts.${text}`));
 
   useEffect(() => {
     input.current.focus();
@@ -36,12 +39,13 @@ const MessagesForm = ({ activeChannel }) => {
       };
 
       try {
-        await socketApi.sendMessage(message);
+        await chatApi('newMessage', message);
         formik.values.body = '';
       } catch (error) {
-        console.error(error.message);
+        notifyError(error.message);
+      } finally {
+        input.current.focus();
       }
-      input.current.focus();
     },
   });
 

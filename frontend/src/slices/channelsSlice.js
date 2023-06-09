@@ -17,7 +17,7 @@ const fetchData = createAsyncThunk(
   },
 );
 
-const initialState = { loading: false, channels: [], currentChannelId: null };
+const initialState = { loading: true, channels: [], currentChannelId: null };
 
 const channelsSlice = createSlice({
   name: 'channels',
@@ -26,14 +26,18 @@ const channelsSlice = createSlice({
     setCurrentChannel: (state, { payload }) => {
       state.currentChannelId = payload.id;
     },
-    addChannel: (state, { payload }) => {
+    newChannel: (state, { payload }) => {
       state.channels.push(payload);
+      state.currentChannelId = payload.id;
     },
-    deleteChannel: (state, { payload }) => {
+    removeChannel: (state, { payload }) => {
       state.channels = state.channels
         .filter((channel) => channel.id !== payload.id);
+      if (state.currentChannelId === payload.id) {
+        state.currentChannelId = 1;
+      }
     },
-    channelRename: (state, { payload }) => {
+    renameChannel: (state, { payload }) => {
       const { id, name } = payload;
       const renamedChannel = state.channels
         .find((channel) => channel.id === id);

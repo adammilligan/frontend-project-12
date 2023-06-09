@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import leoProfanity from 'leo-profanity';
+import { useTranslation } from 'react-i18next';
 import {
   Modal, Form, Button, FormControl,
 } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
-import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-
-import { useSocketApi } from '../../../hooks';
+import { useSelector } from 'react-redux';
+import { useChatApi } from '../../../hooks';
 
 const channelsValidationSchema = (channelsNames, translate) => yup.object().shape({
   name: yup
@@ -21,11 +20,11 @@ const channelsValidationSchema = (channelsNames, translate) => yup.object().shap
     .notOneOf(channelsNames, translate('modals.duplicate')),
 });
 
-const AddChannel = ({ onHide }) => {
+const AddChannelModal = ({ onHide }) => {
   const { t } = useTranslation();
   const channels = useSelector((s) => s.channelsInfo.channels);
   const channelsNames = channels.map((channel) => channel.name);
-  const socketApi = useSocketApi();
+  const chatApi = useChatApi();
 
   const input = useRef(null);
 
@@ -34,6 +33,7 @@ const AddChannel = ({ onHide }) => {
   }, []);
 
   const notify = () => toast.success(t('toasts.createChannel'));
+  const notifyError = (text) => toast.error(t(`toasts.${text}`));
 
   const handleClose = () => {
     onHide();
@@ -48,10 +48,10 @@ const AddChannel = ({ onHide }) => {
     onSubmit: async (values) => {
       const cleanedName = leoProfanity.clean(values.name);
       try {
-        await socketApi.newChannel(cleanedName, handleClose);
+        await chatApi('newChannel', { name: cleanedName }, handleClose);
         formik.values.name = '';
       } catch (error) {
-        console.error(error.message);
+        notifyError(error.message);
       }
     },
   });
@@ -102,4 +102,4 @@ const AddChannel = ({ onHide }) => {
   );
 };
 
-export default AddChannel;
+export default AddChannelModal;

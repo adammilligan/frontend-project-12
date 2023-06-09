@@ -1,11 +1,12 @@
 const ruLocales = {
   translation: {
     toasts: {
-      createChannel: 'Канал успешно создан',
-      removeChannel: 'Канал успешно удален',
-      renameChannel: 'Канал успешно переименован',
+      createChannel: 'Канал создан',
+      removeChannel: 'Канал удалён',
+      renameChannel: 'Канал переименован',
       fetchDataError: 'Произошла ошибка в загрузке данных',
       changeLang: 'Язык успешно изменен на',
+      chatApiError: 'Произошла непредвиденная ошибка',
     },
     modals: {
       duplicate: 'Канал с таким именем уже существует',
@@ -43,6 +44,7 @@ const ruLocales = {
     messageFormPlaceholder: 'Введите сообщение...',
     send: 'Отправить',
     nameLength: 'От 3 до 20 символов',
+    yourNickname: 'Ваш ник',
     signUpPage: {
       minPasswordLength: 'Не менее 6 символов',
       invalidPasswordConfirmation: 'Пароли должны совпадать',

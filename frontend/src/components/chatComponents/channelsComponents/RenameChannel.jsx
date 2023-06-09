@@ -9,7 +9,7 @@ import * as yup from 'yup';
 import { toast } from 'react-toastify';
 
 import { useSelector } from 'react-redux';
-import { useSocketApi } from '../../../hooks';
+import { useChatApi } from '../../../hooks';
 
 const channelsValidationSchema = (channelsNames, translate) => yup.object().shape({
   name: yup
@@ -21,12 +21,12 @@ const channelsValidationSchema = (channelsNames, translate) => yup.object().shap
     .notOneOf(channelsNames, translate('modals.duplicate')),
 });
 
-const RenameChannel = ({ onHide, modalInfo }) => {
+const RenameChannelModal = ({ onHide, modalInfo }) => {
   const { t } = useTranslation();
   const channels = useSelector((s) => s.channelsInfo.channels);
   const channelsNames = channels.map((channel) => channel.name);
-  const currentChannel = modalInfo.channel;
-  const socketApi = useSocketApi();
+  const targetChannel = modalInfo.channel;
+  const chatApi = useChatApi();
 
   const input = useRef(null);
 
@@ -36,6 +36,7 @@ const RenameChannel = ({ onHide, modalInfo }) => {
   }, []);
 
   const notify = () => toast.success(t('toasts.renameChannel'));
+  const notifyError = (text) => toast.error(t(`toasts.${text}`));
 
   const handleClose = () => {
     onHide();
@@ -44,16 +45,16 @@ const RenameChannel = ({ onHide, modalInfo }) => {
 
   const formik = useFormik({
     initialValues: {
-      name: currentChannel.name,
+      name: targetChannel.name,
     },
     validationSchema: channelsValidationSchema(channelsNames, t),
-    onSubmit: async (values) => {
+    onSubmit: (values) => {
       const cleanedName = leoProfanity.clean(values.name);
       try {
-        await socketApi.renameChannel({ name: cleanedName, id: currentChannel.id }, handleClose);
+        chatApi('renameChannel', { name: cleanedName, id: targetChannel.id }, handleClose);
         formik.values.name = '';
       } catch (error) {
-        console.error(error.message);
+        notifyError(error.message);
       }
     },
   });
@@ -104,4 +105,4 @@ const RenameChannel = ({ onHide, modalInfo }) => {
   );
 };
 
-export default RenameChannel;
+export default RenameChannelModal;

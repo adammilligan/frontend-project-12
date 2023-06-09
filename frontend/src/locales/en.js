@@ -6,6 +6,7 @@ const enLocales = {
       renameChannel: 'Channel successfully renamed',
       fetchDataError: 'An error occurred while loading data',
       changeLang: 'Language successfully changed to',
+      chatApiError: 'An unexpected error occurred',
     },
     modals: {
       duplicate: 'A channel with this name already exists',
@@ -42,6 +43,7 @@ const enLocales = {
     messageFormPlaceholder: 'Type a message...',
     send: 'Send',
     nameLength: '3 to 20 characters',
+    yourNickname: 'Your nickname',
     signUpPage: {
       minPasswordLength: 'At least 6 characters',
       invalidPasswordConfirmation: 'Password confirmation does not match the password',

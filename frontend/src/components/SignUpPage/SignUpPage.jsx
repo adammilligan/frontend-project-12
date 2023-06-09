@@ -6,16 +6,16 @@ import { useTranslation } from 'react-i18next';
 import {
   Button, Form, Col, Card, Row,
 } from 'react-bootstrap';
-import { NavLink, useNavigate } from 'react-router-dom';
-import avatarImagePath from '../../assets/avatar_1.jpeg';
+import { NavLink } from 'react-router-dom';
+
 import { useAuth } from '../../hooks';
 import routes from '../../routes/routes.js';
+import avatarImagePath from '../../assets/avatar_1.jpeg';
 
 const SignUpPage = () => {
   const { t } = useTranslation();
   const auth = useAuth();
   const [authFailed, setAuthFailed] = useState(false);
-  const navigate = useNavigate();
   const input = useRef(null);
   useEffect(() => {
     input.current.focus();
@@ -28,19 +28,20 @@ const SignUpPage = () => {
       .trim()
       .min(3, t('nameLength'))
       .max(20, t('nameLength'))
+      .typeError(t('required'))
       .required(t('required')),
     password: yup
       .string()
       .trim()
       .min(6, t('signUpPage.minPasswordLength'))
+      .typeError(t('required'))
       .required(t('required')),
     passwordConfirmation: yup
       .string()
-      .trim()
-      .required(t('required'))
-      .oneOf(
-        [yup.ref('password'), null],
+      .test(
+        'passwordConfirmation',
         t('signUpPage.invalidPasswordConfirmation'),
+        (password, context) => password === context.parent.password,
       ),
   });
 
@@ -60,7 +61,6 @@ const SignUpPage = () => {
         });
         localStorage.setItem('userId', JSON.stringify({ ...res.data }));
         auth.logIn({ username: values.username });
-        navigate(routes.chatPagePath());
       } catch (err) {
         formik.setSubmitting(false);
         if (err.isAxiosError && err.response.status === 409) {
@@ -147,11 +147,6 @@ const SignUpPage = () => {
                     type="submit"
                     variant="outline-primary"
                     className="w-100 mb-3"
-                    disabled={
-                      formik.errors.username
-                      || formik.errors.password
-                      || formik.errors.passwordConfirmation
-                    }
                   >
                     {t('signUpPage.signUp')}
                   </Button>
