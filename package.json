@@ -1,7 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "Chat",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "build": "npm run build --prefix frontend",
@@ -12,10 +12,6 @@
   "author": "Valygin Vadim",
   "license": "ISC",
   "dependencies": {
-    "@hexlet/chat-server": "^1.1.6",
-    "i18next": "^22.5.0",
-    "leo-profanity": "^1.7.0",
-    "react-toastify": "^9.1.3",
-    "socket.io-client": "^4.6.2"
+    "@hexlet/chat-server": "^1.1.6"
   }
 }
