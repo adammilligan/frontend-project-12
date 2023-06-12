@@ -66,7 +66,7 @@ const MessagesForm = ({ activeChannel }) => {
             placeholder={t('messageFormPlaceholder')}
             aria-label={t('newMessage')}
             required
-            className="border-0 p-0 ps-2"
+            className="border-0 p-0 ps-2 ms-0"
             id="body"
           />
           <Button
