@@ -18,16 +18,12 @@ const ChatPage = () => {
   const channelsInfo = useSelector((s) => s.channelsInfo);
 
   useEffect(() => {
-    const fetchData = () => {
-      dispatch(actions.fetchData(auth.getAuthHeader()))
-        .unwrap()
-        .catch(() => {
-          toast.error(t('toasts.fetchDataError'));
-          auth.logOut();
-        });
-    };
-
-    fetchData();
+    dispatch(actions.fetchData(auth.getAuthHeader()))
+      .unwrap()
+      .catch(() => {
+        toast.error(t('toasts.fetchDataError'));
+        auth.logOut();
+      });
   }, [dispatch, t, auth]);
 
   return (
