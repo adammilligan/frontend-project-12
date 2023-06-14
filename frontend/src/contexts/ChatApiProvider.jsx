@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 import { ChatApiContext } from './index.jsx';
@@ -14,17 +14,38 @@ const {
 const ChatApiProvider = ({ children }) => {
   const dispatch = useDispatch();
   const socket = io();
-  socket.on('newMessage', (payload) => {
-    dispatch(newMessage(payload));
-  });
-  socket.on('newChannel', (payload) => {
-    dispatch(newChannel(payload));
-  });
-  socket.on('removeChannel', (payload) => {
-    dispatch(removeChannel(payload));
-  });
-  socket.on('renameChannel', (payload) => {
-    dispatch(renameChannel(payload));
+
+  useEffect(() => {
+    const handleNewMessage = (payload) => {
+      dispatch(newMessage(payload));
+    };
+
+    socket.on('newMessage', handleNewMessage);
+
+    const handleNewChannel = (payload) => {
+      dispatch(newChannel(payload));
+    };
+
+    socket.on('newChannel', handleNewChannel);
+
+    const handleRemoveChannel = (payload) => {
+      dispatch(removeChannel(payload));
+    };
+
+    socket.on('removeChannel', handleRemoveChannel);
+
+    const handleRenameChannel = (payload) => {
+      dispatch(renameChannel(payload));
+    };
+
+    socket.on('renameChannel', handleRenameChannel);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+      socket.off('newChannel', handleNewChannel);
+      socket.off('removeChannel', handleRemoveChannel);
+      socket.off('renameChannel', handleRenameChannel);
+    };
   });
 
   const chatApi = useCallback((action, data, cb = null) => {
