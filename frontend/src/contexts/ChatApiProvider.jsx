@@ -46,7 +46,7 @@ const ChatApiProvider = ({ children }) => {
       socket.off('removeChannel', handleRemoveChannel);
       socket.off('renameChannel', handleRenameChannel);
     };
-  });
+  }, [socket, dispatch]);
 
   const chatApi = useCallback((action, data, cb = null) => {
     socket.emit(action, data, (response) => {
