@@ -51,7 +51,7 @@ const ChatApiProvider = ({ children }) => {
   const chatApi = useCallback((action, data, cb = null) => {
     socket.emit(action, data, (response) => {
       if (cb) {
-        cb();
+        cb(response.data);
       }
       if (response.status !== 'ok') {
         throw new Error('chatApiError');
